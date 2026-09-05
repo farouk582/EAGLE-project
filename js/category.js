@@ -85,29 +85,36 @@ function groupBySubCat(items) {
   return groups;
 }
 
+function isEmptyValue(v) {
+  if (!v) return true;
+  const t = String(v).trim();
+  return t === '' || t === '-' || t === '--';
+}
+
 function buildProductCard(item, index) {
   const id = generateId(item, index);
   const name = item[COLS.name] || '';
-  const desc = item[COLS.desc] || '';
+  const desc = isEmptyValue(item[COLS.desc]) ? '' : item[COLS.desc];
   const warranty = item[COLS.warranty] || '';
   const priceBefore = item[COLS.priceBefore] || '';
   const price = item[COLS.price] || '';
-  const img1 = item[COLS.img1] || '';
+  const img1raw = item[COLS.img1] || '';
+  const img1 = isEmptyValue(img1raw) ? '' : img1raw;
 
-  const descWords = desc.split(' ');
+  const descWords = desc.split(' ').filter(Boolean);
   const descShort = descWords.slice(0, 10).join(' ');
   const descRest = descWords.slice(10).join(' ');
   const hasMore = descWords.length > 10;
 
-  const priceBeforeHTML = (priceBefore && priceBefore !== '-')
+  const priceBeforeHTML = !isEmptyValue(priceBefore)
     ? `<span class="price-before">${priceBefore} جنيه</span>`
     : '';
 
-  const priceHTML = price
+  const priceHTML = !isEmptyValue(price)
     ? `<span class="price-current">${price} جنيه</span>`
     : `<span class="price-current">جاري التحديث</span>`;
 
-  const warrantyHTML = warranty
+  const warrantyHTML = !isEmptyValue(warranty)
     ? `<div class="product-warranty"><i class="fa-solid fa-shield-halved"></i> ضمان: ${warranty}</div>`
     : '';
 
@@ -126,7 +133,7 @@ function buildProductCard(item, index) {
   return `
     <div class="product-card" onclick="goToProduct('${productData}')">
       <div class="product-img">
-        <img src="${img1}" alt="${name}" onerror="this.parentElement.style.background='var(--bg-soft)'">
+        ${img1 ? `<img src="${img1}" alt="${name}" onerror="this.parentElement.style.background='var(--bg-soft)'">` : ''}
       </div>
       <div class="product-body">
         <div class="product-name">${name}</div>
@@ -201,9 +208,6 @@ async function initPage() {
   const allData = await fetchData();
   const normalize = s => (s || '').trim().replace(/\s+/g, ' ');
   const filtered = allData.filter(r => normalize(r[COLS.mainCat]) === normalize(cat));
-  console.log('URL cat:', cat);
-  console.log('Sheet cats:', [...new Set(allData.map(r => r[COLS.mainCat]))]);
-  console.log('Filtered count:', filtered.length);
 
   if (filtered.length === 0) {
     document.getElementById('catContent').innerHTML = `

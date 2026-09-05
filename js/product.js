@@ -12,6 +12,12 @@ const COLS = {
   img2:    'الصور2'
 };
 
+function isEmptyValue(v) {
+  if (!v) return true;
+  const t = String(v).trim();
+  return t === '' || t === '-' || t === '--';
+}
+
 function initBanner(img1, img2) {
   const mainImg = document.getElementById('bannerMainImg');
   const thumb1 = document.getElementById('thumb1');
@@ -19,20 +25,32 @@ function initBanner(img1, img2) {
 
   if (!mainImg) return;
 
-  if (img1) mainImg.src = img1;
+  const validImg1 = !isEmptyValue(img1);
+  const validImg2 = !isEmptyValue(img2);
 
-  if (img2) {
+  if (validImg1) {
+    mainImg.src = img1;
+    thumb1.querySelector('img').src = img1;
+    thumb1.style.display = 'block';
+  } else {
+    thumb1.style.display = 'none';
+  }
+
+  if (validImg2) {
     thumb2.style.display = 'block';
     thumb2.querySelector('img').src = img2;
   } else {
     thumb2.style.display = 'none';
   }
 
-  if (img1) {
-    thumb1.querySelector('img').src = img1;
+  if (!validImg1 && !validImg2) {
+    document.getElementById('bannerMain').innerHTML = '<div class="banner-placeholder"><i class="fa-solid fa-image"></i><span>الصورة غير متاحة</span></div>';
+  } else if (!validImg1 && validImg2) {
+    mainImg.src = img2;
   }
 
   [thumb1, thumb2].forEach(thumb => {
+    if (thumb.style.display === 'none') return;
     thumb.addEventListener('click', () => {
       const src = thumb.querySelector('img').src;
       mainImg.style.opacity = '0';
@@ -60,16 +78,20 @@ function renderProduct(product) {
 
   document.title = `إيجل ميديكال | ${name}`;
 
-  const priceBeforeHTML = (priceBefore && priceBefore !== '-')
+  const priceBeforeHTML = !isEmptyValue(priceBefore)
     ? `<span class="price-before">${priceBefore} جنيه</span>`
     : '';
 
-  const priceHTML = price
+  const priceHTML = !isEmptyValue(price)
     ? `<span class="price-current">${price} جنيه</span>`
     : `<span class="price-current">تواصل معنا للسعر</span>`;
 
-  const warrantyHTML = warranty
+  const warrantyHTML = !isEmptyValue(warranty)
     ? `<div class="product-warranty-box"><i class="fa-solid fa-shield-halved"></i><span>ضمان: ${warranty}</span></div>`
+    : '';
+
+  const descHTML = !isEmptyValue(desc)
+    ? `<p class="product-full-desc">${desc}</p>`
     : '';
 
   const catLink = mainCat
@@ -81,15 +103,15 @@ function renderProduct(product) {
   document.getElementById('productContent').innerHTML = `
     <div class="product-layout">
       <div class="product-banner">
-        <div class="banner-main">
-          <img id="bannerMainImg" src="${img1}" alt="${name}" onerror="this.parentElement.style.background='var(--bg-soft)'">
+        <div class="banner-main" id="bannerMain">
+          <img id="bannerMainImg" alt="${name}" onerror="this.parentElement.style.background='var(--bg-soft)'">
         </div>
         <div class="banner-thumbs">
           <div class="banner-thumb active" id="thumb1">
-            <img src="${img1}" alt="صورة 1">
+            <img alt="صورة 1">
           </div>
           <div class="banner-thumb" id="thumb2" style="display:none">
-            <img src="" alt="صورة 2">
+            <img alt="صورة 2">
           </div>
         </div>
       </div>
@@ -108,7 +130,7 @@ function renderProduct(product) {
 
         ${subCat ? `<div class="product-subcats">${mainCat} » ${subCat}</div>` : ''}
 
-        <p class="product-full-desc">${desc}</p>
+        ${descHTML}
 
         ${warrantyHTML}
 
