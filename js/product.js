@@ -78,6 +78,18 @@ function renderProduct(product) {
 
   document.title = `إيجل ميديكال | ${name}`;
 
+  const seoDesc = !isEmptyValue(desc)
+    ? desc.slice(0, 155)
+    : `${name} - ${mainCat} من إيجل ميديكال، القاهرة. طلب فوري عبر الواتساب.`;
+  const metaDesc = document.getElementById('metaDescription');
+  const ogTitle = document.getElementById('ogTitle');
+  const ogDesc = document.getElementById('ogDescription');
+  const ogImage = document.getElementById('ogImage');
+  if (metaDesc) metaDesc.setAttribute('content', seoDesc);
+  if (ogTitle) ogTitle.setAttribute('content', `إيجل ميديكال | ${name}`);
+  if (ogDesc) ogDesc.setAttribute('content', seoDesc);
+  if (ogImage && !isEmptyValue(img1)) ogImage.setAttribute('content', img1);
+
   const priceBeforeHTML = !isEmptyValue(priceBefore)
     ? `<span class="price-before">${priceBefore} جنيه</span>`
     : '';

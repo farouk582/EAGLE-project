@@ -205,6 +205,14 @@ async function initPage() {
   document.getElementById('catHeading').textContent = cat;
   document.title = `إيجل ميديكال | ${cat}`;
 
+  const seoDesc = `تصفح ${cat} من إيجل ميديكال - أجهزة ومستلزمات طبية معتمدة بالقاهرة مع طلب فوري عبر الواتساب.`;
+  const metaDesc = document.getElementById('metaDescription');
+  const ogTitle = document.getElementById('ogTitle');
+  const ogDesc = document.getElementById('ogDescription');
+  if (metaDesc) metaDesc.setAttribute('content', seoDesc);
+  if (ogTitle) ogTitle.setAttribute('content', `إيجل ميديكال | ${cat}`);
+  if (ogDesc) ogDesc.setAttribute('content', seoDesc);
+
   const allData = await fetchData();
   const normalize = s => (s || '').trim().replace(/\s+/g, ' ');
   const filtered = allData.filter(r => normalize(r[COLS.mainCat]) === normalize(cat));
