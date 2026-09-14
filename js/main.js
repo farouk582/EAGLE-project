@@ -1,3 +1,5 @@
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mqpkrdye';
+
 function sendFeedback() {
   const name = document.getElementById('feedbackName').value.trim();
   const phone = document.getElementById('feedbackPhone').value.trim();
@@ -8,15 +10,23 @@ function sendFeedback() {
     return;
   }
 
-  emailjs.send('service_7c5fzpr', 'template_rp7twyi', { name, phone, message })
-    .then(() => {
+  fetch(FORMSPREE_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({ name, phone, message })
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Formspree request failed');
       document.getElementById('feedbackName').value = '';
       document.getElementById('feedbackPhone').value = '';
       document.getElementById('feedbackMessage').value = '';
       alert('تم إرسال شكواك بنجاح ❤️');
     })
     .catch(err => {
-      console.error('EmailJS Error:', err);
+      console.error('Formspree Error:', err);
       alert('حدث خطأ أثناء الإرسال، حاول مرة أخرى.');
     });
 }
