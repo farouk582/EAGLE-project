@@ -1,0 +1,8 @@
+{
+  "name": "eagle-medical",
+  "version": "1.0.0",
+  "description": "Eagle Medical - Medical supplies and equipment",
+  "dependencies": {
+    "@vercel/speed-insights": "^1.0.12"
+  }
+}
